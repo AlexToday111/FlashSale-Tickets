@@ -55,7 +55,7 @@ public class EventService {
                     seat.setEvent(savedEvent);
                     seat.setSection(s.section());
                     seat.setRowLabel(s.row());
-                    seat.getSeatNumber();
+                    seat.setSeatNumber(s.number());
                     seat.setPriceCents(s.price());
                     return seat;
                 })

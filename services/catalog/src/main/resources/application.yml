@@ -17,3 +17,16 @@ management:
 spring:
   application:
     name: catalog
+  datasource:
+    url: jdbc:postgresql://localhost:5433/catalog
+    username: catalog
+    password: catalog
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: true
+    locations: classpath:db/migration

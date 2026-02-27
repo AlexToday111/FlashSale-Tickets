@@ -6,11 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="catalog-service (1)" />
-        <module name="catalog-service (2)" />
-        <module name="catalog-service (3)" />
-        <module name="catalog-service (4)" />
-        <module name="catalog-service (5)" />
+        <module name="inventory-service" />
+        <module name="order-service" />
+        <module name="payment-service" />
+        <module name="notification-service" />
+        <module name="catalog-service" />
       </profile>
     </annotationProcessing>
   </component>

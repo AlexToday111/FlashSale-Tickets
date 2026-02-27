@@ -5,6 +5,8 @@ import com.ticketing.catalog.api.model.EventEntity;
 import com.ticketing.catalog.api.model.SeatEntity;
 import com.ticketing.catalog.api.repository.EventRepository;
 import com.ticketing.catalog.api.repository.SeatRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,8 @@ public class EventService {
 
     private static final int DEFAULT_LIMIT = 20;
     private static final int MAX_LIMIT = 100;
+    private static final String EVENTS_CACHE = "events";
+    private static final String EVENT_SEATS_CACHE = "eventSeats";
 
     private final EventRepository eventRepository;
     private final SeatRepository seatRepository;
@@ -28,6 +32,7 @@ public class EventService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = {EVENTS_CACHE, EVENT_SEATS_CACHE}, allEntries = true)
     public CreateEventResponse createEvent(CreateEventRequest request) {
         if (request.seats() == null || request.seats().isEmpty()) {
             throw new BadRequestException("seats must not be empty");
@@ -64,7 +69,8 @@ public class EventService {
         return new CreateEventResponse(savedEvent.getId(), savedEvent.getCreatedAt());
     }
 
-    public GetEventsResponse getEvents(int limit, int offset){
+    @Cacheable(cacheNames = EVENTS_CACHE, key = "'limit=' + #limit + '&offset=' + #offset")
+    public GetEventsResponse getEvents(int limit, int offset) {
         int safeLimit = normalizeLimit(limit);
         int safeOffset = Math.max(0, offset);
 
@@ -85,6 +91,7 @@ public class EventService {
         return new GetEventsResponse(items, safeLimit, safeOffset, pageResult.getTotalElements());
     }
 
+    @Cacheable(cacheNames = EVENT_SEATS_CACHE, key = "#eventId")
     public GetEventSeatsResponse getEventSeats(UUID eventId) {
         if (!eventRepository.existsById(eventId)) {
             throw new NotFoundException("event not found: " + eventId);

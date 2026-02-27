@@ -33,7 +33,11 @@ public class EventController {
             @RequestParam(defaultValue = "20") int limit,
             @RequestParam(defaultValue = "0") int offset
     ){
-        return eventService.getEvents(limit, offset);
+        if (limit == 20 && offset == 0){
+            return eventService.getEventFirstPage();
+        } else {
+            return eventService.getEvents(limit, offset);
+        }
     }
 
     @GetMapping("/{id}/seats")

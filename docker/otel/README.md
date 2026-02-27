@@ -17,5 +17,3 @@ OTEL_TRACES_EXPORTER=otlp \
 OTEL_METRICS_EXPORTER=none \
 ./mvnw -pl services/catalog spring-boot:run
 ```
-
-Later this can be wired into Docker Compose; for Day 1 the env vars above are enough.

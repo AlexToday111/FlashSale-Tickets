@@ -31,7 +31,7 @@ public class EventEntity {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    protected EventEntity() {
+    public EventEntity() {
     }
 
     @PrePersist

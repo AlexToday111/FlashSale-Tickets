@@ -36,7 +36,7 @@ public class SeatEntity {
     @Column(name = "price_cents", nullable = false)
     private long priceCents;
 
-    protected SeatEntity () {}
+    public SeatEntity() {}
 
     public UUID getId() {
         return id;

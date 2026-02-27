@@ -22,6 +22,7 @@ public class EventService {
     private static final int MAX_LIMIT = 100;
     private static final String EVENTS_CACHE = "events";
     private static final String EVENT_SEATS_CACHE = "eventSeats";
+    private static final String EVENT_BY_ID_CACHE = "eventById";
 
     private final EventRepository eventRepository;
     private final SeatRepository seatRepository;
@@ -89,6 +90,20 @@ public class EventService {
                 ))
                 .toList();
         return new GetEventsResponse(items, safeLimit, safeOffset, pageResult.getTotalElements());
+    }
+
+    @Cacheable(cacheNames = EVENT_BY_ID_CACHE, key = "#eventId")
+    public EventSummaryDto getEvent(UUID eventId) {
+        EventEntity event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("event not found: " + eventId));
+
+        return new EventSummaryDto(
+                event.getId(),
+                event.getTitle(),
+                event.getVenue(),
+                event.getStartsAt(),
+                EventStatusDto.valueOf(event.getStatus().name())
+        );
     }
 
     @Cacheable(cacheNames = EVENT_SEATS_CACHE, key = "#eventId")

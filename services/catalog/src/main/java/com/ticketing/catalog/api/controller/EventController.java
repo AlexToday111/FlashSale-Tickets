@@ -27,17 +27,17 @@ public class EventController {
     ) {
         return eventService.createEvent(request);
     }
-
     @GetMapping
     public GetEventsResponse getEvents(
             @RequestParam(defaultValue = "20") int limit,
             @RequestParam(defaultValue = "0") int offset
     ){
-        if (limit == 20 && offset == 0){
-            return eventService.getEventFirstPage();
-        } else {
-            return eventService.getEvents(limit, offset);
-        }
+        return eventService.getEvents(limit, offset);
+    }
+
+    @GetMapping("/{id}")
+    public EventSummaryDto getEvent(@PathVariable UUID id) {
+        return eventService.getEvent(id);
     }
 
     @GetMapping("/{id}/seats")

@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "events")
+@Table(name = "event")
 public class EventEntity {
     @Id
     @GeneratedValue()

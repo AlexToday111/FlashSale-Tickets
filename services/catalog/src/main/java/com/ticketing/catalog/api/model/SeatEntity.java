@@ -6,7 +6,7 @@ import java.util.UUID;
 
 @Entity
 @Table(
-        name = "seats",
+        name = "seat",
         uniqueConstraints = @UniqueConstraint(
                 name = "ux_seat_event_place",
                 columnNames = {"event_id", "section", "row_label", "seat_number"}

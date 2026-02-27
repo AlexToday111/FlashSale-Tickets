@@ -111,6 +111,14 @@ services:
     depends_on:
       - prometheus
 
+  # NoSQl
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+
 volumes:
   pg_catalog:
   pg_inventory:

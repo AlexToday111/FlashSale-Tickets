@@ -33,7 +33,7 @@ public class EventService {
     }
 
     @Transactional
-    @CacheEvict(cacheNames = {EVENTS_CACHE, EVENT_SEATS_CACHE}, allEntries = true)
+    @CacheEvict(cacheNames = {EVENTS_CACHE, EVENT_SEATS_CACHE, EVENT_BY_ID_CACHE}, allEntries = true)
     public CreateEventResponse createEvent(CreateEventRequest request) {
         if (request.seats() == null || request.seats().isEmpty()) {
             throw new BadRequestException("seats must not be empty");
@@ -78,7 +78,7 @@ public class EventService {
         int page = safeOffset / safeLimit;
 
         var pageReq = PageRequest.of(page, safeLimit, Sort.by(Sort.Direction.DESC, "startsAt"));
-        var pageResult = eventRepository.findAll(pageReq);
+        var pageResult = eventRepository.findByStatusOrderByStartsAtDesc(EventEntity.Status.PUBLISHED, pageReq);
 
         List<EventSummaryDto> items = pageResult.getContent().stream()
                 .map(e -> new EventSummaryDto(

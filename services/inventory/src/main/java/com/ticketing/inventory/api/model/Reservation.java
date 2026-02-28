@@ -4,6 +4,7 @@ package com.ticketing.inventory.api.model;
 import jakarta.persistence.*;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -84,7 +85,7 @@ public class Reservation {
         this.status = status;
     }
 
-    public Instant getExpiresAt() {
+    public LocalDateTime getExpiresAt() {
         return expiresAt;
     }
 

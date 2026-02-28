@@ -1,6 +1,6 @@
 # FlashSale Tickets (monorepo)
 ## Модули
-- `services/catalog` — каталог событий/билетов.
+- `services/catalog` — каталог событий/билетов (Postgres + Redis‑кэш для чтения событий; есть JPA и интеграционные тесты).
 - `services/inventory` — остатки и резервы.
 - `services/order` — оформление заказов.
 - `services/payment-mock` — заглушка платежей.
@@ -8,7 +8,7 @@
 
 ## Инфраструктура
 - Поднять всю обвязку: `cd docker && docker compose up -d`
-- Включает: Postgres (3 инстанса), RabbitMQ (5672/15672), Jaeger (16686, OTLP 4317/4318), Prometheus (9090), Grafana (3000).
+- Включает: Postgres (3 инстанса), RabbitMQ (5672/15672), Jaeger (16686, OTLP 4317/4318), Prometheus (9090), Grafana (3000), Redis (6379 — кэш каталога).
 - Prometheus смотрит на локально запущенные сервисы через `host.docker.internal:8081/8082/8083` (см. `docker/prometheus/prometheus.yml`).
 - Grafана уже с провиженингом Prometheus datasource (см. `docker/grafana/provisioning/datasource/datasource.yml`), логин `admin/admin` по умолчанию.
 

@@ -98,7 +98,24 @@ mvn -pl services/catalog spring-boot:run
 - Grafana datasource/dashboards: `http://localhost:3000` (логин `admin/admin`)
 - Jaeger UI (трейсы): `http://localhost:16686`
 
+## Технологии
+
+### Inventory Service
+- Spring Boot 3.3.5
+- Spring Data JPA (PostgreSQL)
+- Spring Validation
+- Spring Scheduling (автоматическое истечение бронирований)
+- Swagger/OpenAPI (springdoc-openapi 2.6.0)
+- Flyway (миграции БД)
+- Redis (кэширование)
+
+### Обработка ошибок
+- Глобальный обработчик исключений (`GlobalExceptionHandler`)
+- Кастомные исключения: `ResourceNotFoundException`, `InvalidReservationException`
+- Валидация входных данных через Bean Validation
+
 ## Следующие шаги
 1. Скачай OTEL агент и запусти сервисы с портами 8081/8082/8083 под OTLP endpoint `http://localhost:4317`.
 2. Убедись, что цели в Prometheus зеленые; открой Grafana и Jaeger для проверки метрик/трейсов.
 3. При необходимости добавляй JPA/брокер зависимости в сервисные `pom.xml`.
+4. Настрой подключение к базе данных PostgreSQL для inventory сервиса (аналогично catalog).

@@ -85,7 +85,7 @@ public class Reservation {
         this.status = status;
     }
 
-    public LocalDateTime getExpiresAt() {
+    public Instant getExpiresAt() {
         return expiresAt;
     }
 

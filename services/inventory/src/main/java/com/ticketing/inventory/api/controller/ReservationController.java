@@ -4,7 +4,7 @@ import com.ticketing.inventory.api.dto.ReservationDetailsDTO;
 import com.ticketing.inventory.api.dto.ReservationRequestDTO;
 import com.ticketing.inventory.api.dto.ReservationResponseDTO;
 import com.ticketing.inventory.api.service.ReservationService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +22,7 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponseDTO> createReservation(@RequestBody ReservationRequestDTO reservationRequest) {
+    public ResponseEntity<ReservationResponseDTO> createReservation(@Valid @RequestBody ReservationRequestDTO reservationRequest) {
         ReservationResponseDTO reservationResponse = reservationService.createReservation(reservationRequest);
         return new ResponseEntity<>(reservationResponse, HttpStatus.CREATED);
     }

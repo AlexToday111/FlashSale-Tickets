@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class ReservationExpirationScheduler {
@@ -44,17 +45,19 @@ public class ReservationExpirationScheduler {
                 reservation.setStatus(Reservation.Status.EXPIRED);
                 reservationRepository.save(reservation);
 
-                for (java.util.UUID seatId : reservation.getSeats()) {
-                    SeatState seatState = seatStateRepository.findBySeatId(seatId);
-                    if (seatState != null && seatState.getStatus() == SeatState.Status.BOOKED) {
-                        seatState.setStatus(SeatState.Status.AVAILABLE);
-                        seatState.setUpdatedAt(Instant.now());
-                        seatStateRepository.save(seatState);
-                        log.debug("Released seat {} from expired reservation {}", seatId, reservation.getReservationId());
+                if (reservation.getSeats() != null) {
+                    for (UUID seatId : reservation.getSeats()) {
+                        SeatState seatState = seatStateRepository.findBySeatId(seatId);
+                        if (seatState != null && seatState.getStatus() == SeatState.Status.BOOKED) {
+                            seatState.setStatus(SeatState.Status.AVAILABLE);
+                            seatState.setUpdatedAt(Instant.now());
+                            seatStateRepository.save(seatState);
+                            log.debug("Released seat {} from expired reservation {}", seatId, reservation.getReservationId());
+                        }
                     }
+                    log.info("Expired reservation {} and released {} seats", 
+                        reservation.getReservationId(), reservation.getSeats().size());
                 }
-                log.info("Expired reservation {} and released {} seats", 
-                    reservation.getReservationId(), reservation.getSeats().size());
             }
         }
     }

@@ -66,9 +66,11 @@ public class ReservationService {
 
         for (UUID seatId : reservationRequest.getSeats()) {
             SeatState seatState = seatStateRepository.findBySeatId(seatId);
-            seatState.setStatus(SeatState.Status.BOOKED);
-            seatState.setUpdatedAt(Instant.now());
-            seatStateRepository.save(seatState);
+            if (seatState != null) {
+                seatState.setStatus(SeatState.Status.BOOKED);
+                seatState.setUpdatedAt(Instant.now());
+                seatStateRepository.save(seatState);
+            }
         }
 
         reservationRepository.save(reservation);
@@ -105,12 +107,14 @@ public class ReservationService {
         reservation.setStatus(Reservation.Status.CANCELLED);
         reservationRepository.save(reservation);
 
-        for (UUID seatId : reservation.getSeats()) {
-            SeatState seatState = seatStateRepository.findBySeatId(seatId);
-            if (seatState != null) {
-                seatState.setStatus(SeatState.Status.AVAILABLE);
-                seatState.setUpdatedAt(Instant.now());
-                seatStateRepository.save(seatState);
+        if (reservation.getSeats() != null) {
+            for (UUID seatId : reservation.getSeats()) {
+                SeatState seatState = seatStateRepository.findBySeatId(seatId);
+                if (seatState != null) {
+                    seatState.setStatus(SeatState.Status.AVAILABLE);
+                    seatState.setUpdatedAt(Instant.now());
+                    seatStateRepository.save(seatState);
+                }
             }
         }
     }
@@ -128,14 +132,16 @@ public class ReservationService {
         dto.setUserId(reservation.getUserId());
         dto.setEventId(reservation.getEventId());
 
-        Set<SeatDTO> seatDTOs = reservation.getSeats().stream()
-                .map(seatId -> {
-                    SeatDTO seatDTO = new SeatDTO();
-                    seatDTO.setSeatId(seatId);
-                    return seatDTO;
-                })
-                .collect(Collectors.toSet());
-        dto.setSeats(seatDTOs);
+        if (reservation.getSeats() != null) {
+            Set<SeatDTO> seatDTOs = reservation.getSeats().stream()
+                    .map(seatId -> {
+                        SeatDTO seatDTO = new SeatDTO();
+                        seatDTO.setSeatId(seatId);
+                        return seatDTO;
+                    })
+                    .collect(Collectors.toSet());
+            dto.setSeats(seatDTOs);
+        }
 
         return dto;
     }

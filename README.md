@@ -92,7 +92,6 @@ mvn -pl services/catalog spring-boot:run
 ## Зависимости
 - Управление версиями в корневом `pom.xml` (BOM Spring Boot, springdoc 2.6.0).
 - Общие зависимости сервисов: web, validation, actuator, micrometer-prometheus, springdoc, tests.
-
 ## Где смотреть
 - Prometheus targets: `http://localhost:9090/targets`
 - Grafana datasource/dashboards: `http://localhost:3000` (логин `admin/admin`)

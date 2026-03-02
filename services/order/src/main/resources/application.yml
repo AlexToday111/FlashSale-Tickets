@@ -13,6 +13,8 @@ management:
   metrics:
     tags:
       application: ${spring.application.name:app}
+  inventory:
+    base-url: http://inventory:8080
 
 spring:
   application:

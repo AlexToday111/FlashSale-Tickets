@@ -10,6 +10,11 @@ import com.ticketing.inventory.api.model.Reservation;
 import com.ticketing.inventory.api.model.SeatState;
 import com.ticketing.inventory.api.repository.ReservationRepository;
 import com.ticketing.inventory.api.repository.SeatStateRepository;
+import com.ticketing.reservation.api.ReservationEventBindings;
+import com.ticketing.reservation.api.dto.ReservationCancelled;
+import com.ticketing.reservation.api.dto.ReservationCreated;
+import com.ticketing.reservation.api.dto.ReservationExpired;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +24,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,10 +35,12 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final SeatStateRepository seatStateRepository;
+    private final RabbitTemplate rabbitTemplate;
 
-    public ReservationService(ReservationRepository reservationRepository, SeatStateRepository seatStateRepository) {
+    public ReservationService(ReservationRepository reservationRepository, SeatStateRepository seatStateRepository, RabbitTemplate rabbitTemplate) {
         this.reservationRepository = reservationRepository;
         this.seatStateRepository = seatStateRepository;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @Transactional
@@ -75,6 +83,8 @@ public class ReservationService {
 
         reservationRepository.save(reservation);
 
+        publishCreatedEvent(reservation, reservationRequest.getSeats());
+
         ReservationResponseDTO response = new ReservationResponseDTO();
         response.setReservationId(reservation.getReservationId());
         response.setStatus(reservation.getStatus().toString());
@@ -106,6 +116,8 @@ public class ReservationService {
 
         reservation.setStatus(Reservation.Status.CANCELLED);
         reservationRepository.save(reservation);
+
+        publishCancelledEvent(reservation);
 
         if (reservation.getSeats() != null) {
             for (UUID seatId : reservation.getSeats()) {
@@ -144,5 +156,79 @@ public class ReservationService {
         }
 
         return dto;
+    }
+
+    @Transactional
+    public int expireReservations() {
+        Instant now = Instant.now();
+        List<Reservation> expiredReservations = reservationRepository.findByExpiresAtBefore(now);
+
+        int expiredCount = 0;
+        for (Reservation reservation : expiredReservations) {
+            if (reservation.getStatus() == Reservation.Status.HELD) {
+                reservation.setStatus(Reservation.Status.EXPIRED);
+                reservationRepository.save(reservation);
+
+                if (reservation.getSeats() != null) {
+                    for (UUID seatId : reservation.getSeats()) {
+                        SeatState seatState = seatStateRepository.findBySeatId(seatId);
+                        if (seatState != null && seatState.getStatus() == SeatState.Status.BOOKED) {
+                            seatState.setStatus(SeatState.Status.AVAILABLE);
+                            seatState.setUpdatedAt(Instant.now());
+                            seatStateRepository.save(seatState);
+                        }
+                    }
+                }
+                publishExpiredEvent(reservation);
+                expiredCount++;
+            }
+        }
+        return expiredCount;
+    }
+
+    private void publishCreatedEvent(Reservation reservation, Set<UUID> seatIds) {
+        ReservationCreated event = new ReservationCreated(
+                reservation.getEventId(),
+                reservation.getReservationId(),
+                reservation.getUserId(),
+                seatIds.stream().toList(),
+                Instant.now(),
+                "ReservationCreated",
+                ReservationEventBindings.EVENT_VERSION,
+                UUID.randomUUID()
+        );
+        rabbitTemplate.convertAndSend(ReservationEventBindings.EXCHANGE, ReservationEventBindings.RK_CREATED, event, message -> {
+            message.getMessageProperties().setHeader("eventType", event.eventType());
+            return message;
+        });
+    }
+
+    private void publishCancelledEvent(Reservation reservation) {
+        ReservationCancelled event = new ReservationCancelled(
+                reservation.getReservationId(),
+                "cancelled",
+                Instant.now(),
+                "ReservationCancelled",
+                ReservationEventBindings.EVENT_VERSION,
+                UUID.randomUUID()
+        );
+        rabbitTemplate.convertAndSend(ReservationEventBindings.EXCHANGE, ReservationEventBindings.RK_CANCELLED, event, message -> {
+            message.getMessageProperties().setHeader("eventType", event.eventType());
+            return message;
+        });
+    }
+
+    public void publishExpiredEvent(Reservation reservation) {
+        ReservationExpired event = new ReservationExpired(
+                reservation.getReservationId(),
+                Instant.now(),
+                "ReservationExpired",
+                ReservationEventBindings.EVENT_VERSION,
+                UUID.randomUUID()
+        );
+        rabbitTemplate.convertAndSend(ReservationEventBindings.EXCHANGE, ReservationEventBindings.RK_EXPIRED, event, message -> {
+            message.getMessageProperties().setHeader("eventType", event.eventType());
+            return message;
+        });
     }
 }

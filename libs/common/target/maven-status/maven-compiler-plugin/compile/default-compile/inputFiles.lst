@@ -1,0 +1,4 @@
+/home/ernest/IdeaProjects/FlashSale-Tickets/libs/common/src/main/java/com/ticketing/reservation/api/ReservationEventBindings.java
+/home/ernest/IdeaProjects/FlashSale-Tickets/libs/common/src/main/java/com/ticketing/reservation/api/dto/ReservationCancelled.java
+/home/ernest/IdeaProjects/FlashSale-Tickets/libs/common/src/main/java/com/ticketing/reservation/api/dto/ReservationExpired.java
+/home/ernest/IdeaProjects/FlashSale-Tickets/libs/common/src/main/java/com/ticketing/reservation/api/dto/ReservationCreated.java

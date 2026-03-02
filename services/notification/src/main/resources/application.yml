@@ -17,3 +17,17 @@ management:
 spring:
   application:
     name: notification
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: rabbitmq
+    password: rabbitmq
+
+rabbitmq:
+  management:
+    base-url: http://localhost:15672
+    username: rabbitmq
+    password: rabbitmq
+    vhost: /
+    poll-interval: 10000

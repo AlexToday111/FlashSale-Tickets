@@ -77,6 +77,33 @@ mvn -pl services/catalog spring-boot:run
 ```
 Метрики идут в Prometheus (`/actuator/prometheus`), трейсинг — через OTLP.
 
+## Reservation Events (Day 4)
+### Топология
+```
+reservation.events → notification.reservation.events → (fail) → notification.reservation.events.retry (TTL) → main → ... → notification.reservation.events.dlq
+```
+
+### Демо-команды
+- Поднять инфраструктуру: `cd docker && docker compose up -d`
+- Создать бронирование:
+```
+curl -X POST http://localhost:8082/reservation \
+  -H 'Content-Type: application/json' \
+  -d '{"userId":"00000000-0000-0000-0000-000000000001","eventId":"00000000-0000-0000-0000-000000000002","seats":["00000000-0000-0000-0000-000000000003"]}'
+```
+- Отменить бронь: `curl -X POST http://localhost:8082/reservation/<reservationId>/cancel`
+- Принудительно истечь: `curl -X POST http://localhost:8082/reservation/expire`
+
+### Где смотреть
+- RabbitMQ UI: `http://localhost:15672` (логин/пароль `rabbitmq` / `rabbitmq`)
+- Метрики notification: `http://localhost:8080/actuator/prometheus`
+
+### Минимальные метрики
+- `processed_total`
+- `failures_total`
+- `dlq_total`
+- `queue_messages{queue="..."}` — backlog для main/retry/dlq
+
 ## Быстрые проверки (curl)
 - Health: 
   - Catalog: `curl -f http://localhost:8081/actuator/health`

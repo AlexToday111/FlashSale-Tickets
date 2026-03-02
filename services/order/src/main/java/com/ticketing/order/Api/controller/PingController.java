@@ -1,4 +1,4 @@
-package com.ticketing.order.Api;
+package com.ticketing.order.Api.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

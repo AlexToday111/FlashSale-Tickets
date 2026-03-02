@@ -12,6 +12,7 @@
     <name>ticketing-platform</name>
 
     <modules>
+        <module>libs/common</module>
         <module>services/catalog</module>
         <module>services/inventory</module>
         <module>services/order</module>
@@ -29,7 +30,8 @@
 
         <!-- чтобы кодировка/компилятор не плясали -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>${java.version}</maven.compiler.release>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
     </properties>
 
     <dependencyManagement>
@@ -63,6 +65,13 @@
     <build>
         <pluginManagement>
             <plugins>
+                <!-- Compiler -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.11.0</version>
+                </plugin>
+
                 <!-- Spring Boot plugin -->
                 <plugin>
                     <groupId>org.springframework.boot</groupId>

@@ -9,6 +9,7 @@
         <module name="inventory-service" />
         <module name="order-service" />
         <module name="payment-service" />
+        <module name="common" />
         <module name="notification-service" />
         <module name="catalog-service" />
       </profile>

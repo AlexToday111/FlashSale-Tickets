@@ -39,4 +39,10 @@ public class ReservationController {
         return new ResponseEntity<>(reservationDetails, HttpStatus.OK);
     }
 
+    @PostMapping("/expire")
+    public ResponseEntity<Void> expireReservations() {
+        reservationService.expireReservations();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
 }

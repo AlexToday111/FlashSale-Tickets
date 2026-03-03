@@ -1,10 +1,10 @@
 package com.ticketing.order.Api.Mapper;
 
+import com.ticketing.order.Api.dto.OrderResponse;
 import com.ticketing.order.Api.model.OrderEntity;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
-import org.springframework.web.bind.annotation.Mapping;
-import org.springframework.web.servlet.tags.BindTag;
 
 @Mapper(
         componentModel = "spring",

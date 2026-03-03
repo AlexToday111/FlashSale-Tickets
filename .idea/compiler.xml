@@ -7,11 +7,19 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="inventory-service" />
-        <module name="order-service" />
         <module name="payment-service" />
         <module name="common" />
         <module name="notification-service" />
         <module name="catalog-service" />
+      </profile>
+      <profile name="Annotation profile for ticketing-platform" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
+        </processorPath>
+        <module name="order-service" />
       </profile>
     </annotationProcessing>
   </component>

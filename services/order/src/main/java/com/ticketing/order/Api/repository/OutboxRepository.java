@@ -13,6 +13,8 @@ import java.util.UUID;
 
 public interface OutboxRepository extends JpaRepository<OutboxEntity, UUID> {
 
+    long countByStatus(OutboxEntity.Status status);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query(value = """
             select o

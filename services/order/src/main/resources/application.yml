@@ -13,9 +13,21 @@ management:
   metrics:
     tags:
       application: ${spring.application.name:app}
-  inventory:
-    base-url: http://inventory:8080
 
 spring:
   application:
     name: order
+  datasource:
+    url: jdbc:postgresql://localhost:5435/orders
+    username: orders
+    password: orders
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: true
+    locations: classpath:db/migrationinventory:
+  base-url: http://localhost:8082

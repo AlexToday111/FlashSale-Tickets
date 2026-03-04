@@ -34,7 +34,8 @@ spring:
     host: localhost
     port: 5672
     username: rabbitmq
-    password: rabbitmqspringdoc:
+    password:
+    rabbitmqspringdoc:
   api-docs:
     path: /api-docs
   swagger-ui:

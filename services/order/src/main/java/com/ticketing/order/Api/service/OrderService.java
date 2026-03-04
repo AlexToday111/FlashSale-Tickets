@@ -1,10 +1,12 @@
 package com.ticketing.order.Api.service;
 
+import com.ticketing.contr.events.EventEnvelope;
+import com.ticketing.contr.events.EventTypes;
+import com.ticketing.contr.events.PaymentRequestedPayload;
+import com.ticketing.order.Api.Mapper.OrderMapper;
 import com.ticketing.order.Api.dto.CreateOrderRequest;
 import com.ticketing.order.Api.dto.OrderResponse;
-import com.ticketing.order.Api.dto.PaymentRequestEvent;
 import com.ticketing.order.Api.dto.ReservationView;
-import com.ticketing.order.Api.Mapper.OrderMapper;
 import com.ticketing.order.Api.model.OrderEntity;
 import com.ticketing.order.Api.repository.OrderRepository;
 import com.ticketing.order.infra.client.InventoryClient;
@@ -73,15 +75,21 @@ public class OrderService {
     }
 
     private void publishPaymentRequested(OrderEntity order, ReservationView reservation) {
-        PaymentRequestEvent event = new PaymentRequestEvent(
-                null,
-                Instant.now(),
+        PaymentRequestedPayload payload = new PaymentRequestedPayload(
                 order.getOrderId(),
-                order.getReservationId(),
                 order.getUserId(),
-                order.getTotal()
+                order.getTotal(),
+                "USD",
+                1
         );
-        rabbitTemplate.convertAndSend("payments.exchange", "payments.requested", event);
+
+        EventEnvelope<PaymentRequestedPayload> envelope = EventEnvelope.of(
+                EventTypes.PAYMENT_REQUESTED,
+                order.getOrderId().toString(),
+                payload
+        );
+
+        rabbitTemplate.convertAndSend("payments.exchange", "payments.requested", envelope);
     }
 }
 

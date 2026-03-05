@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Component
 public class RequestIdFilter extends OncePerRequestFilter {
-    public static final String HEADER = "X-Request-Id";
+    public static final String HEADER = "X-Correlation-Id";
     public static final String MDC_KEY = "requestId";
 
     @Override

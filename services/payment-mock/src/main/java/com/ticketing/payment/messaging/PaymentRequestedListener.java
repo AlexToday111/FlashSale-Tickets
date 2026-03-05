@@ -33,6 +33,8 @@ public class PaymentRequestedListener {
     private final Counter processedCounter;
     private final Counter failedCounter;
     private final Counter duplicateCounter;
+    private final Counter paymentSuccessCounter;
+    private final Counter paymentFailureCounter;
 
     public PaymentRequestedListener(ProcessedEventsRepository processedEventsRepository,
                                     RabbitTemplate rabbitTemplate,
@@ -42,6 +44,8 @@ public class PaymentRequestedListener {
         this.processedCounter = meterRegistry.counter("payment_mock.consumer.processed", "consumer", CONSUMER_NAME);
         this.failedCounter = meterRegistry.counter("payment_mock.consumer.failed", "consumer", CONSUMER_NAME);
         this.duplicateCounter = meterRegistry.counter("payment_mock.consumer.duplicate", "consumer", CONSUMER_NAME);
+        this.paymentSuccessCounter = meterRegistry.counter("payment_mock.result.total", "result", "success");
+        this.paymentFailureCounter = meterRegistry.counter("payment_mock.result.total", "result", "failed");
     }
 
     @Transactional
@@ -72,6 +76,7 @@ public class PaymentRequestedListener {
                         payload
                 );
                 rabbitTemplate.convertAndSend(RabbitPaymentConfig.EXCHANGE, "payments.succeeded", envelope);
+                paymentSuccessCounter.increment();
                 log.info("Payment succeeded for orderId={}, eventId={}", payload.orderId(), eventId);
             } else {
                 PaymentFailedPayload payload = new PaymentFailedPayload(
@@ -86,6 +91,7 @@ public class PaymentRequestedListener {
                         payload
                 );
                 rabbitTemplate.convertAndSend(RabbitPaymentConfig.EXCHANGE, "payments.failed", envelope);
+                paymentFailureCounter.increment();
                 log.info("Payment failed for orderId={}, eventId={}", payload.orderId(), eventId);
             }
 

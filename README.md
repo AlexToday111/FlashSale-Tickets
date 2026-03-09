@@ -4,7 +4,7 @@
 
 ## Архитектура
 
-```mermaid
+```
 flowchart LR
     Client --> Gateway[API entrypoint\n(Order API)]
     Gateway --> Order

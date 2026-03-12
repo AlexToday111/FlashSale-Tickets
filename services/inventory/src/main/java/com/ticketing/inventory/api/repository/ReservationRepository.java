@@ -15,4 +15,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
     List<Reservation> findByEventId(UUID eventId);
 
     List<Reservation> findByExpiresAtBefore(Instant now);
+
+    long countByStatus(Reservation.Status status);
 }

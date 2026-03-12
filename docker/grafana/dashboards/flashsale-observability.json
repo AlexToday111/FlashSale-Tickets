@@ -1,0 +1,61 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "graphTooltip": 0,
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "RPS by service",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "targets": [{"expr": "sum by (application) (rate(http_server_requests_seconds_count[1m]))", "refId": "A"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "Latency p95 by service",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "targets": [{"expr": "histogram_quantile(0.95, sum by (le, application) (rate(http_server_requests_seconds_bucket[5m])))", "refId": "A"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "5xx errors by service",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "targets": [{"expr": "sum by (application) (rate(http_server_requests_seconds_count{status=~\"5..\"}[1m]))", "refId": "A"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "Notification failures and DLQ",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "targets": [
+        {"expr": "rate(failures_total[1m])", "legendFormat": "consumer failures", "refId": "A"},
+        {"expr": "max(queue_messages{queue=\"notification.reservation.events.dlq\"})", "legendFormat": "dlq size", "refId": "B"}
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "reserved_count",
+      "gridPos": {"h": 5, "w": 8, "x": 0, "y": 16},
+      "targets": [{"expr": "business_reserved_count", "refId": "A"}]
+    },
+    {
+      "type": "stat",
+      "title": "sold_count",
+      "gridPos": {"h": 5, "w": 8, "x": 8, "y": 16},
+      "targets": [{"expr": "business_sold_count", "refId": "A"}]
+    },
+    {
+      "type": "stat",
+      "title": "payment_fail_rate",
+      "gridPos": {"h": 5, "w": 8, "x": 16, "y": 16},
+      "targets": [{"expr": "sum(rate(payment_mock_result_total{result=\"failed\"}[5m])) / clamp_min(sum(rate(payment_mock_result_total[5m])), 1e-9)", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "percentunit"}, "overrides": []}
+    }
+  ],
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["flashsale", "observability"],
+  "templating": {"list": []},
+  "time": {"from": "now-15m", "to": "now"},
+  "title": "FlashSale Observability",
+  "uid": "flashsale-observability",
+  "version": 1
+}

@@ -1,4 +1,4 @@
-package com.ticketing.catalog.infra;
+package com.ticketing.notification.infra;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,15 +19,16 @@ public class RequestIdFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException{
+                                    FilterChain filterChain) throws ServletException, IOException {
         String requestId = request.getHeader(HEADER);
-        if (requestId == null || requestId.isBlank()){
+        if (requestId == null || requestId.isBlank()) {
             requestId = UUID.randomUUID().toString();
         }
+
         MDC.put(MDC_KEY, requestId);
         response.setHeader(HEADER, requestId);
 
-        try{
+        try {
             filterChain.doFilter(request, response);
         } finally {
             MDC.remove(MDC_KEY);

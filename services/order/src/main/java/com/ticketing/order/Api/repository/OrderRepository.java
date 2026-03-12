@@ -9,4 +9,5 @@ import java.util.UUID;
 public interface OrderRepository extends JpaRepository<OrderEntity, UUID> {
     Optional<OrderEntity> findByReservationId(UUID reservationId);
     boolean existsByReservationId(UUID reservationId);
+    long countByStatus(OrderEntity.Status status);
 }

@@ -1,4 +1,9 @@
 # FlashSale Tickets (monorepo)
+
+<p align="center">
+  <img src="docs/assets/readme-image.png" width="300" height="300" alt="FlashSale Tickets" />
+</p>
+
 ## Модули
 - `services/catalog` — каталог событий/билетов (Postgres + Redis‑кэш для чтения событий; есть JPA и интеграционные тесты).
 - `services/inventory` — управление бронированием мест:
@@ -11,6 +16,22 @@
 - `services/order` — оформление заказов.
 - `services/payment-mock` — заглушка платежей.
 - `services/notification` — уведомления.
+
+## Архитектура
+```mermaid
+flowchart LR
+    Client[Client] --> Gateway["API entrypoint<br/>(Order API)"]
+    Gateway --> Order[Order Service]
+    Order --> Inventory[Inventory Service]
+    Order --> Rabbit[(RabbitMQ)]
+    Rabbit --> Payment[Payment Mock]
+    Rabbit --> Order
+    Rabbit --> Notification[Notification Service]
+
+    CatalogService[Catalog Service] --> CatalogDB[(Catalog DB)]
+    Inventory --> InventoryDB[(Postgres Inventory)]
+    Order --> OrdersDB[(Order DB)]
+```
 
 ## Инфраструктура
 - Поднять всю обвязку: `cd docker && docker compose up -d`
